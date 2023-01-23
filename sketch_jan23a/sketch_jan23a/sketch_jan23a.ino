@@ -19,9 +19,21 @@ if ( Serial.available())
       int motorspeed = analogRead(A0);
       int speed = int(map(rpm, 0,4000,0,255));
       Serial.println(speed);
-      for (int i = motorspeed;i<speed;i++){
+      for (int i = 50;i<speed;i++){
         analogWrite(motor, i);
+      
       }
+    }
+    if(rpm == 0)
+    {
+      for (int i = 100 ;i>50;i--){
+      analogWrite(motor, i);
+      Serial.println("Slowing down");
+        if (i == 50){
+        digitalWrite(motor,0);
+        }
+      }
+    
     }
   }
   
