@@ -1,6 +1,7 @@
 int new_rpm = 0;
 int old_rpm;
-
+int motor1 = 0;
+int motor2 = 0;
 
 void blink() {
   digitalWrite(LED_BUILTIN, HIGH);
@@ -9,20 +10,76 @@ void blink() {
   delay(20);
 }
 
-void motorspeed(int new_speed,int old_speed, int motor) {
+void motorspeed(int new_speed,int old_speed, char motortype) {
+  if (motortype == 'a') {
+    motor1 = 5;
+    motor2 = 2;
+    blink();
+  }
+    
+  if (motortype == 'b') {
+    motor1 = 2;
+    motor2 = 11;
+    blink();
+    delay(200);
+    blink();
+  }
+  if (motortype == 'c') {
+    motor1 = 5;
+    motor2 = 11;
+    blink();
+    delay(200);
+    blink();
+    delay(200);
+    blink();
+  }
+
+
+  if (new_speed == 0) {
+
+    for (int i= old_speed; i> 25; i--) {
+      
+      analogWrite(motor1,i);
+      analogWrite(motor1-2,0);
+      analogWrite(motor2,i);
+      analogWrite(motor2-2,0);
+      delay(10);
+    }
+      analogWrite(motor1,0);
+      analogWrite(motor1-2,0);
+      analogWrite(motor2,0);
+      analogWrite(motor2-2,0);
+  old_speed = 0;
+
+  }
   if (old_speed < new_speed)
   {
-    for (int i= old_rpm; i< new_speed; i++) {
-      analogWrite(motor,i);
-      analogWrite(motor-2,i);
+    for (int i= old_speed; i< new_speed; i++) {
+      analogWrite(motor1,i);
+      analogWrite(motor1-2,0);
+      analogWrite(motor2,i);
+      analogWrite(motor2-2,0);
       delay(10);
-      blink();
+   
     }
   } 
+  if (old_speed > new_speed) {
+  for (int i= old_speed; i> new_speed; i--) {
+      analogWrite(motor1,i);
+      analogWrite(motor1-2,0);
+      analogWrite(motor2,i);
+      analogWrite(motor2-2,0);
+      delay(10);
+
+    }
+  }
 }
 void setup() {
   // put your setup code here, to run once:
 pinMode(3, OUTPUT);
+pinMode(5, OUTPUT);
+pinMode(9, OUTPUT);
+pinMode(11, OUTPUT);
 pinMode(LED_BUILTIN, OUTPUT);
 Serial.begin(9600);
 old_rpm = 0;
@@ -35,9 +92,10 @@ String message = "";
 if ( Serial.available())
   {
   message = Serial.readString();
+  char last = message.charAt(message.length() - 1);
   int message_int = message.toInt();
   new_rpm = map(message_int,0,4000,0,255);
-  motorspeed(new_rpm,old_rpm, 5);
+  motorspeed(new_rpm,old_rpm,last );
   
   }
 
