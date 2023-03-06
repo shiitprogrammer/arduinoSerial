@@ -1,80 +1,81 @@
-int new_rpm = 0;
-int old_rpm;
+int new_rpm;
+int old_rpm1;
+int old_rpm2;
 int motor1 = 0;
 int motor2 = 0;
 
-
-void motorspeed(int new_speed,int old_speed, char motortype) {
-  if (motortype == 'a') {
-    motor1 = 5;
-    motor2 = 2;
-    blink();
-  }
-    
-  if (motortype == 'b') {
-    motor1 = 2;
-    motor2 = 11;
-    blink();
-    delay(200);
-    blink();
-  }
-  if (motortype == 'c') {
-    motor1 = 5;
-    motor2 = 11;
-    blink();
-    delay(200);
-    blink();
-    delay(200);
-    blink();
-  }
-
-
-  if (new_speed == 0) {
+void control_motor(int new_speed, int old_speed, int motor) {
+    if (new_speed == 0) {
 
     for (int i= old_speed; i> 25; i--) {
       
-      analogWrite(motor1,i);
-      analogWrite(motor1-2,0);
-      analogWrite(motor2,i);
-      analogWrite(motor2-2,0);
+      write_motor(motor);
       delay(10);
     }
-      analogWrite(motor1,0);
-      analogWrite(motor1-2,0);
-      analogWrite(motor2,0);
-      analogWrite(motor2-2,0);
-  old_speed = 0;
+      stop_motor(motor);
+      old_speed = 0;
 
   }
   if (old_speed < new_speed)
   {
     for (int i= old_speed; i< new_speed; i++) {
-      analogWrite(motor1,i);
-      analogWrite(motor1-2,0);
-      analogWrite(motor2,i);
-      analogWrite(motor2-2,0);
+      write_motor(motor);
       delay(10);
    
     }
   } 
   if (old_speed > new_speed) {
   for (int i= old_speed; i> new_speed; i--) {
-      analogWrite(motor1,i);
-      analogWrite(motor1-2,0);
-      analogWrite(motor2,i);
-      analogWrite(motor2-2,0);
+      write_motor(motor);
       delay(10);
 
     }
   }
 }
+
+void write_motor(motor) {
+  analogWrite(motor,i);
+  analogWrite(motor-2,0);
+}
+void stop_motor(motor) {
+  analogWrite(motor,0);
+  analogWrite(motor-2,0);
+}
+
+void motorspeed(int new_speed,int old_speed1,int old_speed2, char motortype) {
+  if (motortype == 'a') {
+    motor1 = 5;
+    motor2 = 2;
+    new_speed1 = new_speed;
+    new_speed2 = old_speed2;
+  }
+    
+  if (motortype == 'b') {
+    motor1 = 2;
+    motor2 = 11;
+    new_speed1 = old_speed1;
+    new_speed2 = new_speed;
+   
+  }
+  if (motortype == 'c') {
+    motor1 = 5;
+    motor2 = 11;
+    new_speed1 = new_speed;
+    new_speed2 = new_speed;
+  }
+
+  control_motor(new_speed1,old_speed1,motor1)
+  control_motor(new_speed2,old_speed2,motor2)
+}
 void setup() {
   // put your setup code here, to run once:
 pinMode(3, OUTPUT);
+pinMode(5, OUTPUT);
+pinMode(9, OUTPUT);
+pinMode(11, OUTPUT);
 pinMode(LED_BUILTIN, OUTPUT);
 Serial.begin(9600);
-old_rpm1 = 30;
-old_rpm2 = 30;
+
 
 }
 
@@ -86,13 +87,15 @@ if ( Serial.available())
   message = Serial.readString();
   int message_int = message.toInt();
   new_rpm = map(message_int,0,4000,0,255);
-  motorspeed(new_rpm,old_rpm,last );
+  motorspeed(new_rpm,old_speed1,old_speed2,last );
   
   }
 
-old_rpm1 = new_rpm1;
-old_rpm2 = new_rpm2;
+old_speed1 = new_speed1;
+old_speed2 = new_speed2;
+
 } 
+
 
 
 
